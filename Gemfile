@@ -1,6 +1,7 @@
 source 'https://rubygems.org'
 
+ruby "3.1.2"
+
 gem 'smashing'
 
-## Uncomment this if you want to see use the twitter widget.
-# gem 'twitter', '>= 5.9.0'
+

@@ -5,3 +5,4 @@ _site/
 .bacalhau-global-storage-reader.json
 *DS_STORE
 history.yml
+.env

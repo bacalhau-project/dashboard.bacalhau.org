@@ -1,1 +1,1 @@
-web: smashing start -p 80
+web: smashing start -p $PORT
