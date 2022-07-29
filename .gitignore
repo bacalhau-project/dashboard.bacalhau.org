@@ -3,3 +3,5 @@ _site/
 .jekyll-cache/
 .jekyll-metadata
 .bacalhau-global-storage-reader.json
+*DS_STORE
+history.yml

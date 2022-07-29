@@ -1,0 +1,1 @@
+web: smashing start -p 80
