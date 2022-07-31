@@ -2,7 +2,14 @@ _site/
 .sass-cache/
 .jekyll-cache/
 .jekyll-metadata
+
 .bacalhau-global-storage-reader.json
+.gsutil-boto
+
 *DS_STORE
 history.yml
 .env
+.venv
+.vscode
+
+statsDBFile.txt

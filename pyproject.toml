@@ -7,6 +7,10 @@ authors = ["David Aronchick <aronchick@gmail.com>"]
 [tool.poetry.dependencies]
 python = "^3.10"
 black = "^22.6.0"
+google-cloud = "^0.34.0"
+google-cloud-storage = "^2.4.0"
+python-box = "^6.0.2"
+python-dateutil = "^2.8.2"
 
 [tool.poetry.dev-dependencies]
 
