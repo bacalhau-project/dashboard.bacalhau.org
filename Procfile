@@ -1,4 +1,4 @@
-web: gunicorn buildhealth.wsgi
+web: gunicorn buildhealth.buildhealth.wsgi
 
 build: poetry install && poetry run python3 raw_data/download.py
 

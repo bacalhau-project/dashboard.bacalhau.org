@@ -15,8 +15,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from performance import views
+from buildhealth.buildhealth import performance
+import buildhealth.buildhealth.performance.views as performance_views
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
+    path(r"^admin/", admin.site.urls),
+    path(r"", performance_views.index, name="performance_home"),
 ]

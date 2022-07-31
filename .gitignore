@@ -1,7 +1,6 @@
 _site/
 .sass-cache/
-.jekyll-cache/
-.jekyll-metadata
+staticfiles/*
 
 .bacalhau-global-storage-reader.json
 .gsutil-boto
