@@ -46,6 +46,9 @@ class Result(Box):
 
 
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS", ".bacalhau-global-storage-reader.json")
+if os.environ["GOOGLE_APPLICATION_CREDENTIALS_CONTENT"]:
+    Path(os.environ["GOOGLE_APPLICATION_CREDENTIALS"]).write_text(os.environ["GOOGLE_APPLICATION_CREDENTIALS_CONTENT"])
+
 from_scratch = os.environ.get("FROM_SCRATCH", "false")
 BUCKET_NAME = "bacalhau-global-storage"
 storage_client = storage.Client()
