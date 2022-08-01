@@ -117,6 +117,17 @@ argon2 = ["argon2-cffi (>=19.1.0)"]
 bcrypt = ["bcrypt"]
 
 [[package]]
+name = "django-cors-headers"
+version = "3.13.0"
+description = "django-cors-headers is a Django application for handling the server headers required for Cross-Origin Resource Sharing (CORS)."
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[package.dependencies]
+Django = ">=3.2"
+
+[[package]]
 name = "google-api-core"
 version = "2.8.2"
 description = "Google API client core library"
@@ -434,7 +445,7 @@ brotli = ["brotli"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "1a755aa7ff150ab78129b10465ae5b20386ebaa9125a6ee4d50e1338c2a102e3"
+content-hash = "796e1d7619be23ad077b2656cf92080815050c6ef7751a5bd76a886470a8867a"
 
 [metadata.files]
 asgiref = []
@@ -456,6 +467,7 @@ colorama = []
 dateutils = []
 dj-database-url = []
 django = []
+django-cors-headers = []
 google-api-core = []
 google-auth = []
 google-cloud-core = []
