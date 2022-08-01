@@ -4,3 +4,4 @@ staticfiles
 .env
 db.sqlite3
 getting-started/*
+.bacalhau-global-storage-reader.json
