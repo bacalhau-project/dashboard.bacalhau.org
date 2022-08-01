@@ -50,7 +50,7 @@ from_scratch = os.environ.get("FROM_SCRATCH", "false")
 BUCKET_NAME = "bacalhau-global-storage"
 storage_client = storage.Client()
 
-statsDBFile = Path("statsDBFile.txt")
+statsDBFile = Path(__file__).parent.parent / "dashboards" / "statsDBFile.json"
 statsDB = Box()
 max_date = parse("1901-01-01")  # arbitrary date in history
 
