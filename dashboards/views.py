@@ -10,7 +10,5 @@ def index(request):
 
 def rawStats(request):
     jsonFileName = Path(__file__).parent / "statsDBFile.json"
-    with open(jsonFileName, "r") as file:
-        response = HttpResponse(file, content_type="application/json")
-        response["Content-Disposition"] = f"attachment; filename={jsonFileName}"
-        return response
+    response = HttpResponse(jsonFileName.read_text(), content_type="application/json")
+    return response
