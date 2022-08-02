@@ -10,5 +10,6 @@ import dashboards.views
 urlpatterns = [
     path("", dashboards.views.index, name="index"),
     path("rawstats.json", dashboards.views.rawStats, name="rawstats.json"),
+    path("grafanaperfstats.json", dashboards.views.grafanaPerfStats, name="grafanaperfstats.json"),
     path("admin/", admin.site.urls),
 ]
