@@ -124,3 +124,5 @@ for sha in filteredFiles:
         result.runs[resultFileContent.run_number] = resultFileContent
 
     statsDB[sha] = result
+
+statsDBFile.write_text(statsDB.to_json())
