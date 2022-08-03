@@ -6,3 +6,4 @@ db.sqlite3
 getting-started/*
 *.bacalhau-global-storage-reader.json*
 dashboards/statsDBFile.json
+experiment.py

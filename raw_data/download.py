@@ -1,4 +1,6 @@
 import pathlib
+from random import randint, random
+from turtle import dot
 from typing import OrderedDict, TypedDict, List
 from google.cloud import storage
 import os
@@ -8,6 +10,7 @@ from dateutil.parser import parse
 import operator
 from pprint import pp
 
+import box
 from box import Box
 
 import glob
@@ -17,6 +20,28 @@ from collections import defaultdict
 from pathlib import Path
 import json
 
+import dotenv
+
+import os
+import psycopg2
+import psycopg2.extensions
+import logging
+
+
+class LoggingCursor(psycopg2.extensions.cursor):
+    def execute(self, sql, args=None):
+        logger = logging.getLogger("sql_debug")
+        logger.info(self.mogrify(sql, args))
+
+        try:
+            psycopg2.extensions.cursor.execute(self, sql, args)
+        except Exception as exc:
+            logger.error("%s: %s" % (exc.__class__.__name__, exc))
+            raise
+
+
+dotenv.load_dotenv()
+DATABASE_URL = os.environ["DATABASE_URL"]
 
 class Parameters(Box):
     TOTAL_JOBS: int
@@ -46,27 +71,40 @@ class Result(Box):
 
 
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS", ".bacalhau-global-storage-reader.json")
-if os.environ["GOOGLE_APPLICATION_CREDENTIALS_CONTENT"]:
+if os.environ.get("GOOGLE_APPLICATION_CREDENTIALS_CONTENT", ""):
     Path(os.environ["GOOGLE_APPLICATION_CREDENTIALS"]).write_text(os.environ["GOOGLE_APPLICATION_CREDENTIALS_CONTENT"])
 
 from_scratch = os.environ.get("FROM_SCRATCH", "false")
 BUCKET_NAME = "bacalhau-global-storage"
 storage_client = storage.Client()
 
-statsDBFile = Path(__file__).parent.parent / "dashboards" / "statsDBFile.json"
+statsDBBlobName = "statsDB"
 statsDB = Box()
 max_date = parse("1901-01-01")  # arbitrary date in history
 
-if from_scratch != "true":
-    print(f"Loading from {statsDBFile.absolute().name}...")
-    if statsDBFile.exists():
-        print("File found. Loading...")
-        statsDB = statsDB.from_json(statsDBFile.read_text())
-        print(f"Loaded from {statsDBFile.absolute().name}: {len(statsDB)}")
-        if len(statsDB) > 0:
-            for k, v in statsDB.items():
-                if parse(v["benchmark_time"]).timestamp() > max_date.timestamp():
-                    max_date = parse(v["benchmark_time"])
+
+conn = psycopg2.connect(DATABASE_URL, sslmode="require")
+with conn:
+    if from_scratch != "true":
+        print(f"Loading from {statsDBBlobName}...")
+
+        with conn.cursor(cursor_factory=LoggingCursor) as cursor:
+            postgreSQL_select_statsDB = f"select content from text_blobs where name = %s"
+            cursor.execute(postgreSQL_select_statsDB, (statsDBBlobName,))
+            statsDBresults = cursor.fetchall()
+
+            if len(statsDBresults) == 1:
+                print("Blob found. Loading...")
+                try:
+                    statsDB = statsDB.from_json(statsDBresults[0][0])
+                    print(f"Loaded records: {len(statsDB)}")
+                    if len(statsDB) > 0:
+                        for k, v in statsDB.items():
+                            if parse(v["benchmark_time"]).timestamp() > max_date.timestamp():
+                                max_date = parse(v["benchmark_time"])
+                except (json.decoder.JSONDecodeError, box.exceptions.BoxError):
+                    pass
+    conn.commit()
 
 print(f"Number of files in the DB: {len(statsDB)}")
 storedResultsDict = {}
@@ -125,4 +163,17 @@ for sha in filteredFiles:
 
     statsDB[sha] = result
 
-statsDBFile.write_text(statsDB.to_json())
+with conn:
+    with conn.cursor(cursor_factory=LoggingCursor) as cursor:
+        postgreSQL_insert_statsDB = "INSERT INTO text_blobs (name, content) VALUES (%s, %s) ON CONFLICT (name) DO UPDATE SET content = EXCLUDED.content;"
+        cursor.execute(
+            postgreSQL_insert_statsDB,
+            (
+                statsDBBlobName,
+                statsDB.to_json(),
+            ),
+        )
+
+    conn.commit()
+
+conn.close()

@@ -7,10 +7,38 @@ from box import Box
 import statistics
 import math
 
+import json, box
+
+import dotenv
+
+import os
+import psycopg2
+import psycopg2.extensions
+import logging
+
+DATABASE_URL = os.environ["DATABASE_URL"]
+statsDBBlobName = "statsDB"
+
 
 def getGrafanaPerfStats() -> dict:
-    jsonFileName = Path(__file__).parent / "statsDBFile.json"
-    rawStats = Box.from_json(jsonFileName.read_text())
+    conn = psycopg2.connect(DATABASE_URL, sslmode="require")
+    rawStats = Box()
+    with conn:
+        with conn.cursor() as cursor:
+            postgreSQL_select_statsDB = f"select content from text_blobs where name = %s"
+            cursor.execute(postgreSQL_select_statsDB, (statsDBBlobName,))
+            statsDBresults = cursor.fetchall()
+
+            if len(statsDBresults) == 1:
+                print("Blob found. Loading...")
+                try:
+                    rawStats = Box.from_json(statsDBresults[0][0])
+                    print(f"Loaded records: {len(rawStats.items())}")
+                except (json.decoder.JSONDecodeError, box.exceptions.BoxError):
+                    pass
+
+        conn.commit()
+
     returnStats = []
     for sha in rawStats:
         entry = {}
