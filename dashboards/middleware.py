@@ -52,6 +52,7 @@ def getGrafanaPerfStats() -> dict:
             allRuns += run["runs"][i]["times"]
 
         entry["branch"] = run["branch"]
+        entry["tag"] = run["tag"]
         entry["mean"] = statistics.mean(allRuns)
         entry["min"] = min(allRuns)
         entry["max"] = max(allRuns)
