@@ -1,6 +1,5 @@
 import pathlib
 from random import randint, random
-from turtle import dot
 from typing import OrderedDict, TypedDict, List
 from google.cloud import storage
 import os
@@ -42,6 +41,7 @@ class LoggingCursor(psycopg2.extensions.cursor):
 
 dotenv.load_dotenv()
 DATABASE_URL = os.environ["DATABASE_URL"]
+
 
 class Parameters(Box):
     TOTAL_JOBS: int
