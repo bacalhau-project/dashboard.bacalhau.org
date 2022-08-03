@@ -111,11 +111,13 @@ storedResultsDict = {}
 
 for blob in storage_client.list_blobs(BUCKET_NAME, prefix="perf-results/"):
     keys, filename = blob.name.split("/")[1:]
-    benchmark_time, sha = keys.rsplit("-", 1)
+    benchmark_time, branch, tag, sha = keys.rsplit("-", 3)
     filetype = filename.split("-", 1)[0]
     if sha not in storedResultsDict:
         storedResultsDict[sha] = {}
         storedResultsDict[sha]["benchmark_time"] = parse(benchmark_time)
+        storedResultsDict[sha]["branch"] = branch
+        storedResultsDict[sha]["tag"] = tag
         storedResultsDict[sha]["parameter_file"] = ""
         storedResultsDict[sha]["result_files"] = []
 
