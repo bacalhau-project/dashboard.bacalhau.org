@@ -68,6 +68,8 @@ class Result(Box):
     commit_sha: str
     parameters: Parameters
     runs: dict[str, Run]
+    branch: str
+    tag: str
 
 
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS", ".bacalhau-global-storage-reader.json")
@@ -143,6 +145,8 @@ for sha in filteredFiles:
     result.TOTAL_JOBS = parametersDict["TOTAL_JOBS"]
     result.BATCH_SIZE = parametersDict["BATCH_SIZE"]
     result.CONCURRENCY = parametersDict["CONCURRENCY"]
+    result.branch = fileDict["branch"]
+    result.tag = fileDict["tag"]
     result.runs = defaultdict()
 
     for resultsFileName in fileDict["result_files"]:

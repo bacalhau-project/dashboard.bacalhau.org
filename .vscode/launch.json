@@ -11,8 +11,21 @@
             "program": "${file}",
             "console": "integratedTerminal",
             "env": {
-                "GOOGLE_APPLICATION_CREDENTIALS": "raw_data/.bacalhau-global-storage-reader.json"
+                "GOOGLE_APPLICATION_CREDENTIALS": "raw_data/.bacalhau-global-storage-reader.json",
+                "FROM_SCRATCH": "true",
             },
+            "justMyCode": true
+        },
+        {
+            "name": "Python: Gunicorn",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/.venv/bin/gunicorn",
+            "console": "integratedTerminal",
+            "envFile": "${workspaceFolder}/.env",
+            "args": [
+                "dashboardsproject.wsgi"
+            ],
             "justMyCode": true
         }
     ]
