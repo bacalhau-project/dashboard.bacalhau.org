@@ -112,12 +112,21 @@ print(f"Number of files in the DB: {len(statsDB)}")
 storedResultsDict = {}
 
 for blob in storage_client.list_blobs(BUCKET_NAME, prefix="perf-results/"):
+    print(f"Parsing - {blob.name}")
     keys, filename = blob.name.split("/")[1:]
-    benchmark_time, branch, tag, sha = keys.rsplit("-", 3)
+    benchmark_time, branch_tag_sha = keys.split("Z-", 1)
+    splitValues = branch_tag_sha.rsplit("-", 2)
+    if len(splitValues) == 3:
+        branch, tag, sha = splitValues
+    else:
+        sha = splitValues[0]
+        branch = "main"
+        tag = "NOTAG"
+        
     filetype = filename.split("-", 1)[0]
     if sha not in storedResultsDict:
         storedResultsDict[sha] = {}
-        storedResultsDict[sha]["benchmark_time"] = parse(benchmark_time)
+        storedResultsDict[sha]["benchmark_time"] = parse(benchmark_time + "Z")
         storedResultsDict[sha]["branch"] = branch
         storedResultsDict[sha]["tag"] = tag
         storedResultsDict[sha]["parameter_file"] = ""
