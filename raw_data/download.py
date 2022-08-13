@@ -115,7 +115,7 @@ for blob in storage_client.list_blobs(BUCKET_NAME, prefix="perf-results/"):
     print(f"Parsing - {blob.name}")
     keys, filename = blob.name.split("/")[1:]
     benchmark_time, branch_tag_sha = keys.split("Z-", 1)
-    splitValues = branch_tag_sha.rsplit("-", 3)
+    splitValues = branch_tag_sha.rsplit("-", 3)[1:]
     if len(splitValues) == 3:
         branch, tag, sha = splitValues
     else:
