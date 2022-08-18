@@ -119,7 +119,11 @@ for blob in storage_client.list_blobs(BUCKET_NAME, prefix="perf-results/"):
     if len(splitValues) == 3:
         branch, tag, sha = splitValues
     else:
-        sha = splitValues[0]
+        if len(splitValues) == 0:
+            sha = branch_tag_sha
+        else:
+            sha = splitValues[1]
+
         branch = "main"
         tag = "NOTAG"
 
