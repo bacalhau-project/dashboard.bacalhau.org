@@ -1,3 +1,4 @@
+from fileinput import filename
 import pathlib
 from random import randint, random
 from typing import OrderedDict, TypedDict, List
@@ -25,6 +26,8 @@ import os
 import psycopg2
 import psycopg2.extensions
 import logging
+
+import re
 
 
 class LoggingCursor(psycopg2.extensions.cursor):
@@ -111,23 +114,24 @@ with conn:
 print(f"Number of files in the DB: {len(statsDB)}")
 storedResultsDict = {}
 
+fullRe = re.compile(r"perf-results\/([^Z]+Z)-(.*)\-(v[0-9]+\.[0-9]+\.[0-9]+(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?|NOTAG)-(.*)\/(.*)$")
+shortRe = re.compile(r"perf-results\/([^Z]+Z)-(.*)\/(.*)$")
+
 for blob in storage_client.list_blobs(BUCKET_NAME, prefix="perf-results/"):
     print(f"Parsing - {blob.name}")
-    keys, filename = blob.name.split("/")[1:]
-    benchmark_time, branch_tag_sha = keys.split("Z-", 1)
-    splitValues = branch_tag_sha.rsplit("-", 3)[1:]
-    if len(splitValues) == 3:
-        branch, tag, sha = splitValues
+    longMatches = re.match(fullRe, blob.name)
+    if longMatches is not None and len(longMatches.groups()) == 6:
+        benchmark_time, branch, tag, empty, sha, result_filename = longMatches.groups()[0:6]
     else:
-        if len(splitValues) == 0:
-            sha = branch_tag_sha
+        shortMatches = re.match(shortRe, blob.name)
+        if len(shortMatches.groups()) == 3:
+            benchmark_time, sha, result_filename = shortMatches.groups()[0:3]
+            branch = "main"
+            tag = "NOTAG"
         else:
-            sha = splitValues[1]
+            continue  # Doesn't match either regex, skip to next
 
-        branch = "main"
-        tag = "NOTAG"
-
-    filetype = filename.split("-", 1)[0]
+    filetype = result_filename.split("-", 1)[0]
     if sha not in storedResultsDict:
         storedResultsDict[sha] = {}
         storedResultsDict[sha]["benchmark_time"] = parse(benchmark_time + "Z")
