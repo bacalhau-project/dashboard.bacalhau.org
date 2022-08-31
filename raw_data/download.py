@@ -20,6 +20,8 @@ from collections import defaultdict
 from pathlib import Path
 import json
 
+import ast
+
 import dotenv
 
 import os
@@ -158,7 +160,7 @@ for sha in filteredFiles:
     result.benchmark_time = fileDict["benchmark_time"].isoformat()
     result.commit_sha = sha
     parametersRaw = bucket.get_blob(fileDict["parameters_file"]).download_as_text()
-    parametersDict = json.loads(parametersRaw)
+    parametersDict = ast.literal_eval(parametersRaw)
     result.TOTAL_JOBS = parametersDict["TOTAL_JOBS"]
     result.BATCH_SIZE = parametersDict["BATCH_SIZE"]
     result.CONCURRENCY = parametersDict["CONCURRENCY"]
