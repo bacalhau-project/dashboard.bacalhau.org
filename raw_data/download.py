@@ -160,7 +160,7 @@ for sha in filteredFiles:
     result.benchmark_time = fileDict["benchmark_time"].isoformat()
     result.commit_sha = sha
     parametersRaw = bucket.get_blob(fileDict["parameters_file"]).download_as_text()
-    parametersDict = ast.literal_eval(parametersRaw)
+    parametersDict = ast.literal_eval(parametersRaw)  # Using ast.literal_eval because it can handle spacing better
     result.TOTAL_JOBS = parametersDict["TOTAL_JOBS"]
     result.BATCH_SIZE = parametersDict["BATCH_SIZE"]
     result.CONCURRENCY = parametersDict["CONCURRENCY"]
